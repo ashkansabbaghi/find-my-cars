@@ -90,13 +90,15 @@ TELEGRAM_API_ROOT=https://your-worker.workers.dev
 
 به‌جای cron لوکال می‌توانید مانیتور را با workflow زمان‌بندی‌شده روی GitHub اجرا کنید (`.github/workflows/monitor.yml`).
 
-1. در Settings → Secrets and variables → Actions این Secrets را بگذارید:
+1. یک Environment به نام `production` بسازید (Settings → Environments) و این Secrets را داخل آن بگذارید:
 
 | Secret | الزامی |
 |--------|--------|
 | `TELEGRAM_BOT_TOKEN` | بله |
 | `TELEGRAM_CHAT_ID` | بله |
 | `TELEGRAM_API_ROOT` | خیر — معمولاً روی رانرهای GitHub لازم نیست |
+
+Workflow با `environment: production` به همین Secrets وصل است؛ اگر Environment اسم دیگری دارد، همان را در `.github/workflows/monitor.yml` عوض کنید.
 
 2. Actions را در ریپو فعال کنید؛ workflow هر حدود ۱۰ دقیقه یک بار (و با `workflow_dispatch` دستی) یک cycle با `RUN_ONCE=1` اجرا می‌کند و در صورت تغییر، `data/posts.json` را commit می‌کند تا ران بعدی cold-start نشود.
 
