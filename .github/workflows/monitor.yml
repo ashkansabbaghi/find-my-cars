@@ -12,7 +12,7 @@ permissions:
 jobs:
   monitor:
     runs-on: ubuntu-latest
-    environment: production
+    environment: env-find-my-car
     steps:
       - name: Checkout
         uses: actions/checkout@v4
