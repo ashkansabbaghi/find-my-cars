@@ -17,11 +17,23 @@ import { isStoreEmpty, loadPosts, savePosts } from "./storage.js";
 import {
   createTelegramBot,
   createTelegramLogger,
+  formatTaskStartedMessage,
   notifyCompareResult,
   normalizeTelegramApiRoot,
+  sendTelegramMessage,
   verifyTelegram,
 } from "./telegram.js";
 import type { AppConfig, LogLevel, ScrapedPost } from "./types.js";
+
+function runSource(): string {
+  if (process.env.GITHUB_ACTIONS === "true") {
+    return "GitHub Actions";
+  }
+  if (process.env.RUN_ONCE === "1") {
+    return "once";
+  }
+  return "local";
+}
 
 function parseLogLevel(value: string | undefined): LogLevel {
   if (value === "info" || value === "warn" || value === "error") {
@@ -104,6 +116,18 @@ export async function runCycle(
 ): Promise<void> {
   log.info("cycle start");
 
+  const tgLog = createTelegramLogger(config.logLevel);
+  try {
+    await sendTelegramMessage(
+      bot,
+      config.telegramChatId,
+      formatTaskStartedMessage(runSource()),
+      tgLog,
+    );
+  } catch (err) {
+    log.error("telegram task-started notify failed", err);
+  }
+
   const scraped = await scrapeAllFilters(log);
   const store = await loadPosts();
   const storedCount = Object.keys(store).length;
@@ -123,8 +147,6 @@ export async function runCycle(
   log.info(
     `compare: new=${newCount} price_changed=${changedCount} unchanged=${unchangedCount} notifiable=${notifiable.length}`,
   );
-
-  const tgLog = createTelegramLogger(config.logLevel);
 
   if (coldStart) {
     log.warn(

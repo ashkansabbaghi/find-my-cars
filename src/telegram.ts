@@ -10,6 +10,15 @@ export function formatPrice(price: number | null): string {
   return `${price.toLocaleString("en-US")} تومان`;
 }
 
+export function formatTaskStartedMessage(source: string, at: Date = new Date()): string {
+  const time = at.toLocaleString("fa-IR", {
+    timeZone: "Asia/Tehran",
+    dateStyle: "short",
+    timeStyle: "medium",
+  });
+  return ["✅ تسک ران شد", "", `زمان: ${time}`, `منبع: ${source}`].join("\n");
+}
+
 export function formatNewPostMessage(post: ScrapedPost): string {
   return [
     "🚗 آگهی جدید دیوار",
