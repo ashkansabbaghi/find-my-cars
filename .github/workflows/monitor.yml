@@ -1,0 +1,49 @@
+name: Monitor Divar
+
+on:
+  schedule:
+    # Best-effort; GitHub may delay runs. 10 min is enough for this monitor.
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Run monitor once
+        env:
+          RUN_ONCE: "1"
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_API_ROOT: ${{ secrets.TELEGRAM_API_ROOT }}
+        run: npm start
+
+      - name: Commit posts.json if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/posts.json
+          if git diff --staged --quiet; then
+            echo "No changes to data/posts.json"
+          else
+            git commit -m "chore: update posts.json store"
+            git push
+          fi

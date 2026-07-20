@@ -8,6 +8,7 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
+    "once": "RUN_ONCE=1 tsx src/index.ts",
     "test:telegram": "tsx src/test-telegram.ts"
   },
   "engines": {

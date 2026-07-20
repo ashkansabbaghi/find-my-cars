@@ -86,9 +86,24 @@ TELEGRAM_API_ROOT=https://your-worker.workers.dev
 
 بدون trailing slash هم درست است (کد خودش `/` اضافه می‌کند). درخواست‌ها به شکل `{TELEGRAM_API_ROOT}/bot{token}/{method}` ارسال می‌شوند.
 
+## اجرا با GitHub Actions
+
+به‌جای cron لوکال می‌توانید مانیتور را با workflow زمان‌بندی‌شده روی GitHub اجرا کنید (`.github/workflows/monitor.yml`).
+
+1. در Settings → Secrets and variables → Actions این Secrets را بگذارید:
+
+| Secret | الزامی |
+|--------|--------|
+| `TELEGRAM_BOT_TOKEN` | بله |
+| `TELEGRAM_CHAT_ID` | بله |
+| `TELEGRAM_API_ROOT` | خیر — معمولاً روی رانرهای GitHub لازم نیست |
+
+2. Actions را در ریپو فعال کنید؛ workflow هر حدود ۱۰ دقیقه یک بار (و با `workflow_dispatch` دستی) یک cycle با `RUN_ONCE=1` اجرا می‌کند و در صورت تغییر، `data/posts.json` را commit می‌کند تا ران بعدی cold-start نشود.
+
+تفاوت با لوکال: `npm run dev` اسکجولر را مدام روی ماشین شما نگه می‌دارد؛ روی Actions هر بار یک اجرا و خروج است و `.env` commit نمی‌شود — فقط Secrets.
+
 ## نکات
 
 - در اجرای اول (وقتی `data/posts.json` خالی است) فقط وضعیت فعلی ذخیره می‌شود و نوتیف سیل آگهی‌های موجود ارسال نمی‌شود؛ از دور بعد آگهی‌های جدید/تغییر قیمت اطلاع داده می‌شوند.
 - فاصلهٔ پیشنهادی بین بررسی‌ها حداقل ۳–۵ دقیقه است تا rate limit دیوار کمتر پیش بیاید.
 - استفاده شخصی و مودبانه؛ رعایت شرایط استفادهٔ دیوار بر عهدهٔ شماست.
-# find-my-cars

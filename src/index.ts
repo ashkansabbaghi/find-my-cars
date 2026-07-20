@@ -224,6 +224,10 @@ async function main(): Promise<void> {
   });
 
   await safeRunCycle();
+  if (process.env.RUN_ONCE === "1") {
+    log.info("RUN_ONCE set; exiting");
+    return;
+  }
   task = startScheduler(config.cronSchedule, safeRunCycle);
   log.info("monitor is running");
 }
