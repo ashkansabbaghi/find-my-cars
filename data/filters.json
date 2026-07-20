@@ -1,0 +1,18 @@
+[
+  {
+    "id": "tara-v4",
+    "city": "tehran",
+    "category": "car",
+    "keywords": ["تارا", "V4"],
+    "minPrice": 2000000000,
+    "maxPrice": 2600000000
+  },
+  {
+    "id": "tara-v4",
+    "city": "karaj",
+    "category": "car",
+    "keywords": ["تارا", "V4"],
+    "minPrice": 2000000000,
+    "maxPrice": 2600000000
+  }
+]
