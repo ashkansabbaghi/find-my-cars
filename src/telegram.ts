@@ -1,5 +1,11 @@
 import { Telegraf } from "telegraf";
 
+import {
+  formatCoinPriceChangeMessage,
+  formatCoinSnapshotMessage,
+  type CoinCompareResult,
+  type CoinQuote,
+} from "./coins.js";
 import { createLogger, type Logger } from "./logger.js";
 import type { CompareResult, LogLevel, ScrapedPost } from "./types.js";
 
@@ -192,6 +198,38 @@ export async function notifyCompareResult(
     return;
   }
   log.info(`notify skipped: kind=${result.kind} (not notifiable)`);
+}
+
+export async function notifyCoinSnapshot(
+  bot: Telegraf,
+  chatId: string,
+  quotes: CoinQuote[],
+  log: Logger = createLogger("telegram", "info"),
+): Promise<void> {
+  log.info(`notify coin snapshot count=${quotes.length}`);
+  await sendTelegramMessage(bot, chatId, formatCoinSnapshotMessage(quotes), log);
+}
+
+export async function notifyCoinCompareResult(
+  bot: Telegraf,
+  chatId: string,
+  result: CoinCompareResult,
+  log: Logger = createLogger("telegram", "info"),
+  allQuotes?: CoinQuote[],
+): Promise<void> {
+  log.info(
+    `notify coin kind=${result.kind} slug=${result.quote.slug} price=${result.quote.price}`,
+  );
+  if (result.kind === "price_changed") {
+    await sendTelegramMessage(
+      bot,
+      chatId,
+      formatCoinPriceChangeMessage(result, allQuotes),
+      log,
+    );
+    return;
+  }
+  log.info(`notify coin skipped: kind=${result.kind} (not notifiable)`);
 }
 
 export function createTelegramLogger(level: LogLevel): Logger {

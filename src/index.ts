@@ -4,6 +4,15 @@ import type { ScheduledTask } from "node-cron";
 import type { Telegraf } from "telegraf";
 
 import {
+  applyCoinCompareResults,
+  compareCoinQuotes,
+  isCoinsStoreEmpty,
+  loadCoins,
+  saveCoins,
+  scrapeCoinQuotes,
+  type CoinQuote,
+} from "./coins.js";
+import {
   applyCompareResults,
   comparePosts,
   pruneStalePosts,
@@ -18,6 +27,8 @@ import {
   createTelegramBot,
   createTelegramLogger,
   formatTaskStartedMessage,
+  notifyCoinCompareResult,
+  notifyCoinSnapshot,
   notifyCompareResult,
   normalizeTelegramApiRoot,
   sendTelegramMessage,
@@ -109,10 +120,16 @@ async function scrapeAllFilters(log: Logger): Promise<ScrapedPost[]> {
   return dedupeById(collected);
 }
 
+export interface RunCycleOptions {
+  /** Always send a coin price snapshot (used on local startup). */
+  forceCoinSnapshot?: boolean;
+}
+
 export async function runCycle(
   config: AppConfig,
   bot: Telegraf,
   log: Logger = createLogger("index", config.logLevel),
+  options: RunCycleOptions = {},
 ): Promise<void> {
   log.info("cycle start");
 
@@ -128,14 +145,33 @@ export async function runCycle(
     log.error("telegram task-started notify failed", err);
   }
 
-  const scraped = await scrapeAllFilters(log);
+  const nowIso = new Date().toISOString();
+
+  const [carsOutcome, coinsOutcome] = await Promise.all([
+    scrapeAllFilters(log)
+      .then((scraped) => ({ ok: true as const, scraped }))
+      .catch((err: unknown) => ({ ok: false as const, err })),
+    scrapeCoinQuotes(log)
+      .then((quotes) => ({ ok: true as const, quotes }))
+      .catch((err: unknown) => ({ ok: false as const, err })),
+  ]);
+
+  if (!carsOutcome.ok) {
+    log.error("car scrape failed", carsOutcome.err);
+  }
+  if (!coinsOutcome.ok) {
+    log.error("coin scrape failed", coinsOutcome.err);
+  }
+
+  const scraped = carsOutcome.ok ? carsOutcome.scraped : [];
+  const coinQuotes: CoinQuote[] = coinsOutcome.ok ? coinsOutcome.quotes : [];
+
   const store = await loadPosts();
   const storedCount = Object.keys(store).length;
   const coldStart = isStoreEmpty(store);
   log.info(`store loaded: ${storedCount} post(s), coldStart=${coldStart}`);
 
   const results = comparePosts(scraped, store);
-  const nowIso = new Date().toISOString();
   let nextStore = applyCompareResults(store, results, nowIso);
 
   const newCount = results.filter((r) => r.kind === "new").length;
@@ -153,7 +189,7 @@ export async function runCycle(
       `cold start: store was empty — baselining ${scraped.length} post(s); Telegram notifications SKIPPED on purpose (will notify only on later new/price_changed)`,
     );
   } else if (notifiable.length === 0) {
-    log.info("no notifiable changes this cycle; nothing to send to Telegram");
+    log.info("no notifiable car changes this cycle");
   } else {
     log.info(
       `sending ${notifiable.length} Telegram notification(s) to chatId=${config.telegramChatId}`,
@@ -168,6 +204,56 @@ export async function runCycle(
     }
   }
 
+  if (coinQuotes.length > 0) {
+    const coinStore = await loadCoins();
+    const coinColdStart = isCoinsStoreEmpty(coinStore);
+    const coinResults = compareCoinQuotes(coinQuotes, coinStore);
+    const nextCoinStore = applyCoinCompareResults(
+      coinStore,
+      coinResults,
+      nowIso,
+    );
+    const coinChanged = coinResults.filter((r) => r.kind === "price_changed");
+    log.info(
+      `coins compare: coldStart=${coinColdStart} changed=${coinChanged.length}`,
+    );
+
+    if (coinColdStart || options.forceCoinSnapshot) {
+      log.warn(
+        coinColdStart
+          ? "coin cold start: baselining quotes and sending initial snapshot"
+          : "startup: sending coin price snapshot",
+      );
+      try {
+        await notifyCoinSnapshot(bot, config.telegramChatId, coinQuotes, tgLog);
+      } catch (err) {
+        log.error("telegram coin snapshot failed", err);
+      }
+    } else if (coinChanged.length === 0) {
+      log.info("no coin price changes this cycle");
+    } else {
+      for (const result of coinChanged) {
+        try {
+          await notifyCoinCompareResult(
+            bot,
+            config.telegramChatId,
+            result,
+            tgLog,
+            coinQuotes,
+          );
+          log.info(`notified coin price_changed: ${result.quote.slug}`);
+        } catch (err) {
+          log.error(
+            `telegram coin notify failed for ${result.quote.slug}`,
+            err,
+          );
+        }
+      }
+    }
+
+    await saveCoins(nextCoinStore);
+  }
+
   const pruned = pruneStalePosts(nextStore, config.pruneDays);
   nextStore = pruned.store;
   if (pruned.removedIds.length > 0) {
@@ -176,7 +262,7 @@ export async function runCycle(
 
   await savePosts(nextStore);
   log.info(
-    `cycle done: scraped=${scraped.length} new=${newCount} price_changed=${changedCount} unchanged=${unchangedCount} stored=${Object.keys(nextStore).length}`,
+    `cycle done: scraped=${scraped.length} new=${newCount} price_changed=${changedCount} unchanged=${unchangedCount} stored=${Object.keys(nextStore).length} coins=${coinQuotes.length}`,
   );
 }
 
@@ -208,12 +294,12 @@ async function main(): Promise<void> {
   let shuttingDown = false;
   let cycleInFlight: Promise<void> | undefined;
 
-  const safeRunCycle = async (): Promise<void> => {
+  const safeRunCycle = async (options: RunCycleOptions = {}): Promise<void> => {
     if (cycleInFlight) {
       log.warn("previous cycle still running; skipping");
       return;
     }
-    cycleInFlight = runCycle(config, bot, log).finally(() => {
+    cycleInFlight = runCycle(config, bot, log, options).finally(() => {
       cycleInFlight = undefined;
     });
     await cycleInFlight;
@@ -245,12 +331,15 @@ async function main(): Promise<void> {
     void shutdown("SIGTERM");
   });
 
-  await safeRunCycle();
+  // yarn dev / long-running: send current coin prices once on startup.
+  // RUN_ONCE (e.g. GitHub Actions) only notifies on cold start / price change.
+  const forceCoinSnapshot = process.env.RUN_ONCE !== "1";
+  await safeRunCycle({ forceCoinSnapshot });
   if (process.env.RUN_ONCE === "1") {
     log.info("RUN_ONCE set; exiting");
     return;
   }
-  task = startScheduler(config.cronSchedule, safeRunCycle);
+  task = startScheduler(config.cronSchedule, () => safeRunCycle());
   log.info("monitor is running");
 }
 
