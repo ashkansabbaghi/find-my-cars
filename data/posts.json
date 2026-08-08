@@ -105,7 +105,7 @@
     "city": "کرج",
     "url": "https://divar.ir/v/gaW1RghH",
     "firstSeen": "2026-07-20T07:53:29.946Z",
-    "lastSeen": "2026-08-08T10:16:20.627Z",
+    "lastSeen": "2026-08-08T10:54:37.501Z",
     "lastPrice": 2350000000,
     "filterId": "tara-v4"
   },
@@ -182,7 +182,7 @@
     "city": "تهران",
     "url": "https://divar.ir/v/QanTG-Jl",
     "firstSeen": "2026-07-20T09:46:29.385Z",
-    "lastSeen": "2026-08-08T10:16:20.627Z",
+    "lastSeen": "2026-08-08T10:54:37.501Z",
     "lastPrice": 2400000000,
     "filterId": "tara-v4"
   },
@@ -193,7 +193,7 @@
     "city": "تهران",
     "url": "https://divar.ir/v/QaT7XPWC",
     "firstSeen": "2026-07-20T09:46:29.385Z",
-    "lastSeen": "2026-08-08T10:16:20.627Z",
+    "lastSeen": "2026-08-08T10:54:37.501Z",
     "lastPrice": 2420000000,
     "filterId": "tara-v4"
   },
@@ -336,7 +336,7 @@
     "city": "تهران",
     "url": "https://divar.ir/v/gaRhe4gK",
     "firstSeen": "2026-07-21T07:13:29.356Z",
-    "lastSeen": "2026-08-05T12:11:59.652Z",
+    "lastSeen": "2026-08-08T10:54:37.501Z",
     "lastPrice": 2300000000,
     "filterId": "tara-v4"
   },
@@ -402,7 +402,7 @@
     "city": "کرج",
     "url": "https://divar.ir/v/gafxj5ul",
     "firstSeen": "2026-07-21T09:43:33.443Z",
-    "lastSeen": "2026-08-08T10:16:20.627Z",
+    "lastSeen": "2026-08-08T10:54:37.501Z",
     "lastPrice": 2500000000,
     "filterId": "tara-v4"
   },
@@ -659,17 +659,6 @@
     "lastPrice": 2100000000,
     "filterId": "tara-v4"
   },
-  "gakdXIuq": {
-    "id": "gakdXIuq",
-    "title": "تارا V4 مدل ۱۴۰۴",
-    "price": 2390000000,
-    "city": "تهران",
-    "url": "https://divar.ir/v/gakdXIuq",
-    "firstSeen": "2026-07-25T09:09:08.500Z",
-    "lastSeen": "2026-07-25T10:43:25.730Z",
-    "lastPrice": 2390000000,
-    "filterId": "tara-v4"
-  },
   "gakZnrNf": {
     "id": "gakZnrNf",
     "title": "تارا اتوماتیک V4 tu5p مدل ۱۴۰۴",
@@ -754,7 +743,7 @@
     "city": "تهران",
     "url": "https://divar.ir/v/wZNeO82c",
     "firstSeen": "2026-07-26T07:26:42.368Z",
-    "lastSeen": "2026-08-08T10:16:20.627Z",
+    "lastSeen": "2026-08-08T10:54:37.501Z",
     "lastPrice": 2150000000,
     "filterId": "tara-v4"
   },
@@ -1359,7 +1348,7 @@
     "city": "کرج",
     "url": "https://divar.ir/v/gaytRt_i",
     "firstSeen": "2026-08-04T18:16:33.255Z",
-    "lastSeen": "2026-08-08T10:16:20.627Z",
+    "lastSeen": "2026-08-08T10:54:37.501Z",
     "lastPrice": 2520000000,
     "filterId": "tara-v4"
   },
@@ -1381,7 +1370,7 @@
     "city": "تهران",
     "url": "https://divar.ir/v/gazFwgSo",
     "firstSeen": "2026-08-05T10:01:51.194Z",
-    "lastSeen": "2026-08-08T10:16:20.627Z",
+    "lastSeen": "2026-08-08T10:54:37.501Z",
     "lastPrice": 2492000000,
     "filterId": "tara-v4"
   },
@@ -1392,7 +1381,7 @@
     "city": "تهران",
     "url": "https://divar.ir/v/gayhfCP_",
     "firstSeen": "2026-08-05T10:01:51.194Z",
-    "lastSeen": "2026-08-08T10:16:20.627Z",
+    "lastSeen": "2026-08-08T10:54:37.501Z",
     "lastPrice": 2380000000,
     "filterId": "tara-v4"
   },
@@ -1425,7 +1414,7 @@
     "city": "کرج",
     "url": "https://divar.ir/v/gaShl-w8",
     "firstSeen": "2026-08-05T12:11:59.652Z",
-    "lastSeen": "2026-08-08T10:16:20.627Z",
+    "lastSeen": "2026-08-08T10:54:37.501Z",
     "lastPrice": 2475000000,
     "filterId": "tara-v4"
   },
@@ -1524,7 +1513,7 @@
     "city": "کرج",
     "url": "https://divar.ir/v/ga0VmEzi",
     "firstSeen": "2026-08-06T11:35:46.566Z",
-    "lastSeen": "2026-08-08T10:16:20.627Z",
+    "lastSeen": "2026-08-08T10:54:37.501Z",
     "lastPrice": 2570000000,
     "filterId": "tara-v4"
   },
@@ -1623,7 +1612,7 @@
     "city": "تهران",
     "url": "https://divar.ir/v/ga2l_QDq",
     "firstSeen": "2026-08-08T09:47:36.901Z",
-    "lastSeen": "2026-08-08T10:16:20.627Z",
+    "lastSeen": "2026-08-08T10:54:37.501Z",
     "lastPrice": 2510000000,
     "filterId": "tara-v4"
   },
@@ -1634,7 +1623,7 @@
     "city": "تهران",
     "url": "https://divar.ir/v/ga2dv_Sg",
     "firstSeen": "2026-08-08T09:47:36.901Z",
-    "lastSeen": "2026-08-08T10:16:20.627Z",
+    "lastSeen": "2026-08-08T10:54:37.501Z",
     "lastPrice": 2150000000,
     "filterId": "tara-v4"
   }
