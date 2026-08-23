@@ -193,7 +193,7 @@
     "city": "تهران",
     "url": "https://divar.ir/v/gaygWm8H",
     "firstSeen": "2026-07-21T11:31:33.931Z",
-    "lastSeen": "2026-08-23T15:31:05.022Z",
+    "lastSeen": "2026-08-23T15:54:50.904Z",
     "lastPrice": 2350000000,
     "filterId": "tara-v4"
   },
@@ -259,7 +259,7 @@
     "city": "تهران",
     "url": "https://divar.ir/v/gaPR0IJx",
     "firstSeen": "2026-07-22T11:17:20.705Z",
-    "lastSeen": "2026-08-23T15:31:05.022Z",
+    "lastSeen": "2026-08-23T15:54:50.904Z",
     "lastPrice": 2010000000,
     "filterId": "tara-v4"
   },
@@ -613,17 +613,6 @@
     "firstSeen": "2026-08-08T12:51:06.014Z",
     "lastSeen": "2026-08-11T06:39:17.041Z",
     "lastPrice": 2385000000,
-    "filterId": "tara-v4"
-  },
-  "ga3JjBVA": {
-    "id": "ga3JjBVA",
-    "title": "تارا V4",
-    "price": 2230000000,
-    "city": "کرج",
-    "url": "https://divar.ir/v/ga3JjBVA",
-    "firstSeen": "2026-08-08T14:18:57.393Z",
-    "lastSeen": "2026-08-09T15:50:49.424Z",
-    "lastPrice": 2230000000,
     "filterId": "tara-v4"
   },
   "ga3ZBI08": {
@@ -1678,7 +1667,7 @@
     "city": "کرج",
     "url": "https://divar.ir/v/gaIy0INQ",
     "firstSeen": "2026-08-21T13:14:45.810Z",
-    "lastSeen": "2026-08-23T15:31:05.022Z",
+    "lastSeen": "2026-08-23T15:54:50.904Z",
     "lastPrice": 2500000000,
     "filterId": "tara-v4"
   },
@@ -1898,7 +1887,7 @@
     "city": "تهران",
     "url": "https://divar.ir/v/gaKWtmLa",
     "firstSeen": "2026-08-23T11:33:40.696Z",
-    "lastSeen": "2026-08-23T15:31:05.022Z",
+    "lastSeen": "2026-08-23T15:54:50.904Z",
     "lastPrice": 2100000000,
     "filterId": "tara-v4"
   },
@@ -1909,7 +1898,7 @@
     "city": "تهران",
     "url": "https://divar.ir/v/gaKWesCW",
     "firstSeen": "2026-08-23T12:37:58.400Z",
-    "lastSeen": "2026-08-23T15:31:05.022Z",
+    "lastSeen": "2026-08-23T15:54:50.904Z",
     "lastPrice": 2550000000,
     "filterId": "tara-v4"
   }
