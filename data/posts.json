@@ -226,7 +226,7 @@
     "city": "تهران",
     "url": "https://divar.ir/v/gaPR0IJx",
     "firstSeen": "2026-07-22T11:17:20.705Z",
-    "lastSeen": "2026-08-23T18:41:44.009Z",
+    "lastSeen": "2026-08-29T08:56:45.622Z",
     "lastPrice": 2010000000,
     "filterId": "tara-v4"
   },
@@ -281,7 +281,7 @@
     "city": "تهران",
     "url": "https://divar.ir/v/gact4o0F",
     "firstSeen": "2026-07-25T07:00:33.544Z",
-    "lastSeen": "2026-08-24T15:52:02.646Z",
+    "lastSeen": "2026-08-29T08:56:45.622Z",
     "lastPrice": 2100000000,
     "filterId": "tara-v4"
   },
@@ -347,7 +347,7 @@
     "city": "تهران",
     "url": "https://divar.ir/v/gapBKRlA",
     "firstSeen": "2026-07-29T07:26:54.716Z",
-    "lastSeen": "2026-08-26T12:50:58.880Z",
+    "lastSeen": "2026-08-29T08:56:45.622Z",
     "lastPrice": 2410000000,
     "filterId": "tara-v4"
   },
@@ -380,7 +380,7 @@
     "city": "تهران",
     "url": "https://divar.ir/v/gatpJu8i",
     "firstSeen": "2026-08-01T08:54:27.009Z",
-    "lastSeen": "2026-08-26T07:05:12.773Z",
+    "lastSeen": "2026-08-29T08:56:45.622Z",
     "lastPrice": 2460000000,
     "filterId": "tara-v4"
   },
@@ -402,7 +402,7 @@
     "city": "تهران",
     "url": "https://divar.ir/v/gatJemuv",
     "firstSeen": "2026-08-01T12:43:02.752Z",
-    "lastSeen": "2026-08-25T12:18:00.716Z",
+    "lastSeen": "2026-08-29T08:56:45.622Z",
     "lastPrice": 2390000000,
     "filterId": "tara-v4"
   },
@@ -549,28 +549,6 @@
     "lastPrice": 2150000000,
     "filterId": "tara-v4"
   },
-  "ga6JcOyP": {
-    "id": "ga6JcOyP",
-    "title": "تارا V4",
-    "price": 2320000000,
-    "city": "تهران",
-    "url": "https://divar.ir/v/ga6JcOyP",
-    "firstSeen": "2026-08-11T06:39:17.041Z",
-    "lastSeen": "2026-08-15T06:55:13.837Z",
-    "lastPrice": 2320000000,
-    "filterId": "tara-v4"
-  },
-  "ga69tMhw": {
-    "id": "ga69tMhw",
-    "title": "تارا V4 اتومات ، مدل ۴۰۴",
-    "price": 2240000000,
-    "city": "کرج",
-    "url": "https://divar.ir/v/ga69tMhw",
-    "firstSeen": "2026-08-11T08:55:07.710Z",
-    "lastSeen": "2026-08-15T08:56:50.254Z",
-    "lastPrice": 2240000000,
-    "filterId": "tara-v4"
-  },
   "ga7lHcqZ": {
     "id": "ga7lHcqZ",
     "title": "تارا V4",
@@ -582,17 +560,6 @@
     "lastPrice": 2390000000,
     "filterId": "tara-v4"
   },
-  "ga-VgN6g": {
-    "id": "ga-VgN6g",
-    "title": "تارا فول V4 اتومات LX",
-    "price": 2450000000,
-    "city": "تهران",
-    "url": "https://divar.ir/v/ga-VgN6g",
-    "firstSeen": "2026-08-13T18:10:51.759Z",
-    "lastSeen": "2026-08-15T05:44:26.561Z",
-    "lastPrice": 2450000000,
-    "filterId": "tara-v4"
-  },
   "ga99P9kc": {
     "id": "ga99P9kc",
     "title": "تارا V4 اتومات",
@@ -602,17 +569,6 @@
     "firstSeen": "2026-08-13T18:10:51.759Z",
     "lastSeen": "2026-08-24T14:10:31.885Z",
     "lastPrice": 2350000000,
-    "filterId": "tara-v4"
-  },
-  "ga-VLuYe": {
-    "id": "ga-VLuYe",
-    "title": "تارا V4 اتوماتیک",
-    "price": 2590000000,
-    "city": "تهران",
-    "url": "https://divar.ir/v/ga-VLuYe",
-    "firstSeen": "2026-08-14T07:46:54.568Z",
-    "lastSeen": "2026-08-15T05:44:26.561Z",
-    "lastPrice": 2590000000,
     "filterId": "tara-v4"
   },
   "ga-RNYS-": {
@@ -666,7 +622,7 @@
     "city": "تهران",
     "url": "https://divar.ir/v/ga6tNSnI",
     "firstSeen": "2026-08-15T08:27:59.531Z",
-    "lastSeen": "2026-08-29T01:59:30.970Z",
+    "lastSeen": "2026-08-29T08:56:45.622Z",
     "lastPrice": 2425000000,
     "filterId": "tara-v4"
   },
@@ -853,7 +809,7 @@
     "city": "تهران",
     "url": "https://divar.ir/v/gaC64Cn2",
     "firstSeen": "2026-08-17T05:08:24.346Z",
-    "lastSeen": "2026-08-29T01:59:30.970Z",
+    "lastSeen": "2026-08-29T08:56:45.622Z",
     "lastPrice": 2000000000,
     "filterId": "tara-v4"
   },
@@ -1304,7 +1260,7 @@
     "city": "تهران",
     "url": "https://divar.ir/v/gaH2gtg7",
     "firstSeen": "2026-08-20T14:59:39.126Z",
-    "lastSeen": "2026-08-29T01:59:30.970Z",
+    "lastSeen": "2026-08-29T08:56:45.622Z",
     "lastPrice": 2230000000,
     "filterId": "tara-v4"
   },
@@ -1553,12 +1509,12 @@
   "gaukXnHj": {
     "id": "gaukXnHj",
     "title": "تارا V1 و V4/ نقد یا اقساط(وستا خودرو)",
-    "price": 2080000000,
+    "price": 2220000000,
     "city": "تهران",
     "url": "https://divar.ir/v/gaukXnHj",
     "firstSeen": "2026-08-23T09:26:43.276Z",
-    "lastSeen": "2026-08-26T04:52:20.688Z",
-    "lastPrice": 2080000000,
+    "lastSeen": "2026-08-29T08:56:45.622Z",
+    "lastPrice": 2220000000,
     "filterId": "tara-v4"
   },
   "gawBWRJ_": {
@@ -1854,19 +1810,19 @@
     "city": "تهران",
     "url": "https://divar.ir/v/gaRmMLSE",
     "firstSeen": "2026-08-28T18:55:11.390Z",
-    "lastSeen": "2026-08-29T01:59:30.970Z",
+    "lastSeen": "2026-08-29T08:56:45.622Z",
     "lastPrice": 2600000000,
     "filterId": "tara-v4"
   },
   "gaReWJIS": {
     "id": "gaReWJIS",
     "title": "تارا اتومات ۱۴۰۳ V4",
-    "price": 2430000000,
+    "price": 2480000000,
     "city": "تهران",
     "url": "https://divar.ir/v/gaReWJIS",
     "firstSeen": "2026-08-28T18:55:11.390Z",
-    "lastSeen": "2026-08-29T01:59:30.970Z",
-    "lastPrice": 2430000000,
+    "lastSeen": "2026-08-29T08:56:45.622Z",
+    "lastPrice": 2480000000,
     "filterId": "tara-v4"
   },
   "gaRmSZfs": {
@@ -1876,7 +1832,7 @@
     "city": "تهران",
     "url": "https://divar.ir/v/gaRmSZfs",
     "firstSeen": "2026-08-28T18:55:11.390Z",
-    "lastSeen": "2026-08-29T01:59:30.970Z",
+    "lastSeen": "2026-08-29T08:56:45.622Z",
     "lastPrice": 2290000000,
     "filterId": "tara-v4"
   },
@@ -1887,8 +1843,52 @@
     "city": "تهران",
     "url": "https://divar.ir/v/gaRqdeah",
     "firstSeen": "2026-08-29T01:59:30.970Z",
-    "lastSeen": "2026-08-29T01:59:30.970Z",
+    "lastSeen": "2026-08-29T08:56:45.622Z",
     "lastPrice": 2600000000,
+    "filterId": "tara-v4"
+  },
+  "gaSCILjh": {
+    "id": "gaSCILjh",
+    "title": "تارا V4 اتومات پلاس TU5 و EF7 توربو صفر خشک",
+    "price": 2400000000,
+    "city": "تهران",
+    "url": "https://divar.ir/v/gaSCILjh",
+    "firstSeen": "2026-08-29T08:56:45.622Z",
+    "lastSeen": "2026-08-29T08:56:45.622Z",
+    "lastPrice": 2400000000,
+    "filterId": "tara-v4"
+  },
+  "gaSyXvi5": {
+    "id": "gaSyXvi5",
+    "title": "تارا V4 مدل ۱۴۰۳ بیرنگ",
+    "price": 2400000000,
+    "city": "تهران",
+    "url": "https://divar.ir/v/gaSyXvi5",
+    "firstSeen": "2026-08-29T08:56:45.622Z",
+    "lastSeen": "2026-08-29T08:56:45.622Z",
+    "lastPrice": 2400000000,
+    "filterId": "tara-v4"
+  },
+  "gaJKoYU6": {
+    "id": "gaJKoYU6",
+    "title": "تارا پلاس V4 اتو و دنده V1خشک",
+    "price": 2480000000,
+    "city": "تهران",
+    "url": "https://divar.ir/v/gaJKoYU6",
+    "firstSeen": "2026-08-29T08:56:45.622Z",
+    "lastSeen": "2026-08-29T08:56:45.622Z",
+    "lastPrice": 2480000000,
+    "filterId": "tara-v4"
+  },
+  "gaSqYdth": {
+    "id": "gaSqYdth",
+    "title": "تارا مدل 403 V4اتومات فول بیرنگ وخط استثنایی",
+    "price": 2530000000,
+    "city": "کرج",
+    "url": "https://divar.ir/v/gaSqYdth",
+    "firstSeen": "2026-08-29T08:56:45.622Z",
+    "lastSeen": "2026-08-29T08:56:45.622Z",
+    "lastPrice": 2530000000,
     "filterId": "tara-v4"
   }
 }
