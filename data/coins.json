@@ -2,25 +2,25 @@
   "sekee": {
     "slug": "sekee",
     "name": "سکه امامی",
-    "price": 2722700000,
+    "price": 2719100000,
     "firstSeen": "2026-08-01T11:46:13.541Z",
-    "lastSeen": "2026-10-06T13:39:49.517Z",
-    "lastPrice": 2722700000
+    "lastSeen": "2026-10-06T19:05:34.135Z",
+    "lastPrice": 2719100000
   },
   "nim": {
     "slug": "nim",
     "name": "نیم سکه",
-    "price": 1435900000,
+    "price": 1434600000,
     "firstSeen": "2026-08-01T11:46:13.541Z",
-    "lastSeen": "2026-10-06T13:39:49.517Z",
-    "lastPrice": 1435900000
+    "lastSeen": "2026-10-06T19:05:34.135Z",
+    "lastPrice": 1434600000
   },
   "gerami": {
     "slug": "gerami",
     "name": "سکه گرمی",
     "price": 381500000,
     "firstSeen": "2026-08-01T11:46:13.541Z",
-    "lastSeen": "2026-10-06T13:39:49.517Z",
+    "lastSeen": "2026-10-06T19:05:34.135Z",
     "lastPrice": 381500000
   }
 }
