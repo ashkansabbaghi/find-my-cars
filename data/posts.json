@@ -17,7 +17,7 @@
     "city": "تهران",
     "url": "https://divar.ir/v/ga6gEoK7",
     "firstSeen": "2026-07-22T11:17:20.705Z",
-    "lastSeen": "2026-10-19T06:49:15.840Z",
+    "lastSeen": "2026-10-19T14:04:52.322Z",
     "lastPrice": 2500000000,
     "filterId": "tara-v4"
   },
@@ -28,7 +28,7 @@
     "city": "تهران",
     "url": "https://divar.ir/v/QaZ7P3At",
     "firstSeen": "2026-07-26T07:26:42.368Z",
-    "lastSeen": "2026-10-19T06:49:15.840Z",
+    "lastSeen": "2026-10-19T14:04:52.322Z",
     "lastPrice": 2455000000,
     "filterId": "tara-v4"
   },
@@ -85,17 +85,6 @@
     "firstSeen": "2026-09-15T11:11:44.878Z",
     "lastSeen": "2026-10-13T03:58:45.427Z",
     "lastPrice": 2100000000,
-    "filterId": "tara-v4"
-  },
-  "gahGQTpD": {
-    "id": "gahGQTpD",
-    "title": "تارا V4 اتومات /تارا v1 (نقد و اقساط .سود بانکی )",
-    "price": 2340000000,
-    "city": "تهران",
-    "url": "https://divar.ir/v/gahGQTpD",
-    "firstSeen": "2026-09-19T14:29:58.949Z",
-    "lastSeen": "2026-10-05T09:28:42.769Z",
-    "lastPrice": 2340000000,
     "filterId": "tara-v4"
   },
   "garubheP": {
@@ -270,7 +259,7 @@
     "city": "تهران",
     "url": "https://divar.ir/v/gaG7zA4C",
     "firstSeen": "2026-10-07T15:49:30.625Z",
-    "lastSeen": "2026-10-12T01:44:32.050Z",
+    "lastSeen": "2026-10-19T14:04:52.322Z",
     "lastPrice": 2300000000,
     "filterId": "tara-v4"
   },
@@ -281,7 +270,7 @@
     "city": "تهران",
     "url": "https://divar.ir/v/gaptbMJK",
     "firstSeen": "2026-10-07T15:49:30.625Z",
-    "lastSeen": "2026-10-11T07:07:19.349Z",
+    "lastSeen": "2026-10-19T14:04:52.322Z",
     "lastPrice": 2290000000,
     "filterId": "tara-v4"
   },
@@ -358,7 +347,7 @@
     "city": "تهران",
     "url": "https://divar.ir/v/gan8KhF4",
     "firstSeen": "2026-10-13T11:39:04.901Z",
-    "lastSeen": "2026-10-19T06:49:15.840Z",
+    "lastSeen": "2026-10-19T14:04:52.322Z",
     "lastPrice": 2530000000,
     "filterId": "tara-v4"
   },
@@ -380,7 +369,7 @@
     "city": "تهران",
     "url": "https://divar.ir/v/QatpNwvT",
     "firstSeen": "2026-10-13T11:39:04.901Z",
-    "lastSeen": "2026-10-19T06:49:15.840Z",
+    "lastSeen": "2026-10-19T14:04:52.322Z",
     "lastPrice": 2470000000,
     "filterId": "tara-v4"
   },
@@ -413,7 +402,7 @@
     "city": "تهران",
     "url": "https://divar.ir/v/gaP73U3Z",
     "firstSeen": "2026-10-14T17:47:53.927Z",
-    "lastSeen": "2026-10-19T06:49:15.840Z",
+    "lastSeen": "2026-10-19T14:04:52.322Z",
     "lastPrice": 2100000000,
     "filterId": "tara-v4"
   },
@@ -435,7 +424,7 @@
     "city": "تهران",
     "url": "https://divar.ir/v/ga9mvXd5",
     "firstSeen": "2026-10-16T11:46:03.580Z",
-    "lastSeen": "2026-10-19T06:49:15.840Z",
+    "lastSeen": "2026-10-19T14:04:52.322Z",
     "lastPrice": 2350000000,
     "filterId": "tara-v4"
   },
@@ -468,7 +457,7 @@
     "city": "تهران",
     "url": "https://divar.ir/v/gaUjbAmK",
     "firstSeen": "2026-10-18T13:27:18.461Z",
-    "lastSeen": "2026-10-19T06:49:15.840Z",
+    "lastSeen": "2026-10-19T14:04:52.322Z",
     "lastPrice": 2455000000,
     "filterId": "tara-v4"
   },
@@ -479,8 +468,19 @@
     "city": "تهران",
     "url": "https://divar.ir/v/gaV_KL-u",
     "firstSeen": "2026-10-19T06:49:15.840Z",
-    "lastSeen": "2026-10-19T06:49:15.840Z",
+    "lastSeen": "2026-10-19T14:04:52.322Z",
     "lastPrice": 2350000000,
+    "filterId": "tara-v4"
+  },
+  "gaq2oo94": {
+    "id": "gaq2oo94",
+    "title": "تارا V4 توربو اتومات صفر 1405 (اقساطی)",
+    "price": 2500000000,
+    "city": "تهران",
+    "url": "https://divar.ir/v/gaq2oo94",
+    "firstSeen": "2026-10-19T14:04:52.322Z",
+    "lastSeen": "2026-10-19T14:04:52.322Z",
+    "lastPrice": 2500000000,
     "filterId": "tara-v4"
   }
 }
