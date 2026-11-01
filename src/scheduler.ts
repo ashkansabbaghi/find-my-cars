@@ -18,7 +18,7 @@ export function startScheduler(
       }
     },
     {
-      name: "divar-monitor",
+      name: "coin-monitor",
       noOverlap: true,
     },
   );

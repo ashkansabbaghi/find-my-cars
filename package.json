@@ -1,7 +1,7 @@
 {
-  "name": "divar-monitor-bot",
+  "name": "coin-monitor-bot",
   "version": "1.0.0",
-  "description": "Monitor Divar listings and notify via Telegram on new posts and price changes",
+  "description": "Monitor TGJU coin prices and notify via Telegram on price changes",
   "type": "module",
   "main": "dist/index.js",
   "scripts": {

@@ -5,13 +5,18 @@ import { fileURLToPath } from "node:url";
 
 import type { Logger } from "./logger.js";
 
-const COIN_PAGE_URL = "https://www.tgju.org/coin";
+const TGJU_URL = "https://www.tgju.org";
+const COIN_PAGE_URL = `${TGJU_URL}/coin`;
+const GOLD_PAGE_URL = `${TGJU_URL}/gold-chart`;
+const GLOBAL_GOLD_PAGE_URL = `${TGJU_URL}/gold-global`;
+const TEHRAN_TZ = "Asia/Tehran";
 const DEFAULT_TIMEOUT_MS = 20_000;
 const MAX_ATTEMPTS = 3;
 const RETRY_BASE_DELAY_MS = 1_000;
 
 const ROOT_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const DEFAULT_COINS_PATH = path.join(ROOT_DIR, "data", "coins.json");
+const DEFAULT_DAILY_PATH = path.join(ROOT_DIR, "data", "daily.json");
 
 const BROWSER_HEADERS = {
   "User-Agent":
@@ -21,21 +26,32 @@ const BROWSER_HEADERS = {
   Referer: "https://www.tgju.org/",
 } as const;
 
-/** Cash-market rows on tgju.org/coin (not retail / bubble). */
+/** ریال for Iranian markets, US dollars for the global ounce. */
+export type PriceUnit = "rial" | "usd";
+
+/** Coin and gold rows tracked on TGJU, in report order (cash market, not retail / bubble). */
 export const TRACKED_COINS = [
-  { slug: "sekee", name: "سکه امامی" },
-  { slug: "nim", name: "نیم سکه" },
-  { slug: "gerami", name: "سکه گرمی" },
-] as const;
+  { slug: "sekee", name: "سکه امامی", page: COIN_PAGE_URL, unit: "rial" },
+  { slug: "nim", name: "نیم سکه", page: COIN_PAGE_URL, unit: "rial" },
+  { slug: "gerami", name: "سکه گرمی", page: COIN_PAGE_URL, unit: "rial" },
+  { slug: "geram18", name: "طلای ۱۸ عیار (هر گرم)", page: GOLD_PAGE_URL, unit: "rial" },
+  { slug: "mesghal", name: "مثقال طلا", page: GOLD_PAGE_URL, unit: "rial" },
+  { slug: "ons", name: "انس طلا (جهانی)", page: GLOBAL_GOLD_PAGE_URL, unit: "usd" },
+] as const satisfies readonly {
+  slug: string;
+  name: string;
+  page: string;
+  unit: PriceUnit;
+}[];
 
 export type CoinSlug = (typeof TRACKED_COINS)[number]["slug"];
 
 export interface CoinQuote {
   slug: CoinSlug;
   name: string;
-  /** Price as published on TGJU (ریال). */
+  unit: PriceUnit;
+  /** Price as published on TGJU (ریال or USD, see unit). */
   price: number;
-  url: string;
 }
 
 export interface StoredCoin {
@@ -43,19 +59,19 @@ export interface StoredCoin {
   name: string;
   price: number;
   firstSeen: string;
+  /** When lastPrice was recorded. */
   lastSeen: string;
+  /** Price at the last report; changes are measured against it. */
   lastPrice: number;
 }
 
 export type CoinsStore = Partial<Record<CoinSlug, StoredCoin>>;
 
-export type CoinCompareKind = "new" | "price_changed" | "unchanged";
-
-export interface CoinCompareResult {
-  kind: CoinCompareKind;
-  quote: CoinQuote;
-  previous?: StoredCoin;
-  priceDelta?: number;
+export interface DailyReport {
+  /** Tehran calendar day (YYYY-MM-DD) the report was sent. */
+  date: string;
+  /** Prices at that report; the next daily report compares against them. */
+  prices: CoinsStore;
 }
 
 function sleep(ms: number): Promise<void> {
@@ -102,7 +118,8 @@ async function getWithRetry(
 }
 
 export function parsePriceString(raw: string): number | null {
-  const digits = raw.replace(/[^\d]/g, "");
+  // Keep the decimal point: the global ounce is quoted like "3,875.84".
+  const digits = raw.replace(/[^\d.]/g, "");
   if (!digits) {
     return null;
   }
@@ -149,36 +166,45 @@ function extractRowPrice(html: string, slug: string): number | null {
   return null;
 }
 
-/** Extract cash-market quotes for Emami / half / gram from TGJU HTML. */
-export function parseCoinQuotes(html: string): CoinQuote[] {
+/** Extract quotes for the tracked rows listed on `page`; rows missing from the HTML are skipped. */
+export function parseCoinQuotes(html: string, page: string): CoinQuote[] {
   const quotes: CoinQuote[] = [];
 
   for (const coin of TRACKED_COINS) {
+    if (coin.page !== page) {
+      continue;
+    }
     const price = extractRowPrice(html, coin.slug);
     if (price === null) {
-      throw new Error(`coin row not found for ${coin.slug} (${coin.name})`);
+      console.warn(`[coins] row not found for ${coin.slug} (${coin.name}) on ${page}`);
+      continue;
     }
-    quotes.push({
-      slug: coin.slug,
-      name: coin.name,
-      price,
-      url: `${COIN_PAGE_URL}#${coin.slug}`,
-    });
+    quotes.push({ slug: coin.slug, name: coin.name, unit: coin.unit, price });
   }
 
   return quotes;
 }
 
-export async function fetchCoinHtml(): Promise<string> {
-  console.info(`[coins] GET ${COIN_PAGE_URL}`);
-  const response = await getWithRetry(COIN_PAGE_URL);
+export async function fetchPageHtml(url: string): Promise<string> {
+  console.info(`[coins] GET ${url}`);
+  const response = await getWithRetry(url);
   return response.data;
 }
 
-export async function scrapeCoinQuotes(log?: Logger): Promise<CoinQuote[]> {
-  const html = await fetchCoinHtml();
-  const quotes = parseCoinQuotes(html);
-  log?.info(
+/** Scrape every tracked page; a page that fails is logged and its rows left out. */
+export async function scrapeCoinQuotes(log: Logger): Promise<CoinQuote[]> {
+  const pages = [...new Set(TRACKED_COINS.map((coin) => coin.page))];
+  const quotes: CoinQuote[] = [];
+
+  for (const page of pages) {
+    try {
+      quotes.push(...parseCoinQuotes(await fetchPageHtml(page), page));
+    } catch (err) {
+      log.error(`scrape failed for ${page}`, err);
+    }
+  }
+
+  log.info(
     `coins scraped: ${quotes
       .map((q) => `${q.name}=${q.price.toLocaleString("en-US")}`)
       .join(", ")}`,
@@ -190,90 +216,135 @@ export function getDefaultCoinsPath(): string {
   return DEFAULT_COINS_PATH;
 }
 
-export async function loadCoins(
-  filePath: string = DEFAULT_COINS_PATH,
-): Promise<CoinsStore> {
+async function readJsonObject(
+  filePath: string,
+): Promise<Record<string, unknown> | undefined> {
   try {
     const raw = await readFile(filePath, "utf8");
     const parsed: unknown = JSON.parse(raw);
     if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
-      return {};
+      return undefined;
     }
-    return parsed as CoinsStore;
+    return parsed as Record<string, unknown>;
   } catch (err) {
     const code = (err as NodeJS.ErrnoException).code;
     if (code === "ENOENT") {
-      return {};
+      return undefined;
     }
     throw err;
   }
+}
+
+async function writeJsonAtomic(filePath: string, value: unknown): Promise<void> {
+  await mkdir(path.dirname(filePath), { recursive: true });
+  const tmpPath = `${filePath}.${process.pid}.${Date.now()}.tmp`;
+  const payload = `${JSON.stringify(value, null, 2)}\n`;
+  await writeFile(tmpPath, payload, "utf8");
+  await rename(tmpPath, filePath);
+}
+
+export async function loadCoins(
+  filePath: string = DEFAULT_COINS_PATH,
+): Promise<CoinsStore> {
+  return ((await readJsonObject(filePath)) ?? {}) as CoinsStore;
 }
 
 export async function saveCoins(
   store: CoinsStore,
   filePath: string = DEFAULT_COINS_PATH,
 ): Promise<void> {
-  await mkdir(path.dirname(filePath), { recursive: true });
-  const tmpPath = `${filePath}.${process.pid}.${Date.now()}.tmp`;
-  const payload = `${JSON.stringify(store, null, 2)}\n`;
-  await writeFile(tmpPath, payload, "utf8");
-  await rename(tmpPath, filePath);
+  await writeJsonAtomic(filePath, store);
+}
+
+export async function loadDailyReport(
+  filePath: string = DEFAULT_DAILY_PATH,
+): Promise<DailyReport | undefined> {
+  const parsed = await readJsonObject(filePath);
+  if (typeof parsed?.date !== "string" || !parsed.prices || typeof parsed.prices !== "object") {
+    return undefined;
+  }
+  return parsed as unknown as DailyReport;
+}
+
+export async function saveDailyReport(
+  report: DailyReport,
+  filePath: string = DEFAULT_DAILY_PATH,
+): Promise<void> {
+  await writeJsonAtomic(filePath, report);
 }
 
 export function isCoinsStoreEmpty(store: CoinsStore): boolean {
   return TRACKED_COINS.every((coin) => store[coin.slug] === undefined);
 }
 
-export function compareCoinQuotes(
+/** Signed percent change from oldPrice to newPrice. */
+export function changePercent(oldPrice: number, newPrice: number): number {
+  return ((newPrice - oldPrice) / oldPrice) * 100;
+}
+
+/** Quotes that moved at least thresholdPercent from their stored baseline. */
+export function findPriceAlerts(
   quotes: CoinQuote[],
   store: CoinsStore,
-): CoinCompareResult[] {
-  return quotes.map((quote) => {
+  thresholdPercent: number,
+): CoinQuote[] {
+  return quotes.filter((quote) => {
     const previous = store[quote.slug];
-    if (!previous) {
-      return { kind: "new", quote };
-    }
-    if (previous.lastPrice !== quote.price) {
-      return {
-        kind: "price_changed",
-        quote,
-        previous,
-        priceDelta: Math.abs(quote.price - previous.lastPrice),
-      };
-    }
-    return { kind: "unchanged", quote, previous };
+    return (
+      previous !== undefined &&
+      Math.abs(changePercent(previous.lastPrice, quote.price)) >= thresholdPercent
+    );
   });
 }
 
-export function applyCoinCompareResults(
+/** Record quotes as the new baseline; rows not in `quotes` keep their old one. */
+export function rebaseline(
   store: CoinsStore,
-  results: CoinCompareResult[],
+  quotes: CoinQuote[],
   nowIso: string,
 ): CoinsStore {
   const next: CoinsStore = { ...store };
-  for (const result of results) {
-    const { quote } = result;
-    const previous = next[quote.slug];
-    if (!previous) {
-      next[quote.slug] = {
-        slug: quote.slug,
-        name: quote.name,
-        price: quote.price,
-        firstSeen: nowIso,
-        lastSeen: nowIso,
-        lastPrice: quote.price,
-      };
-      continue;
-    }
+  for (const quote of quotes) {
     next[quote.slug] = {
-      ...previous,
+      slug: quote.slug,
       name: quote.name,
       price: quote.price,
+      firstSeen: store[quote.slug]?.firstSeen ?? nowIso,
       lastSeen: nowIso,
       lastPrice: quote.price,
     };
   }
   return next;
+}
+
+function tehranParts(now: Date): { date: string; hour: number } {
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat("en-CA", {
+      timeZone: TEHRAN_TZ,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      hourCycle: "h23",
+    })
+      .formatToParts(now)
+      .map((part) => [part.type, part.value]),
+  );
+  return { date: `${parts.year}-${parts.month}-${parts.day}`, hour: Number(parts.hour) };
+}
+
+export function tehranDate(now: Date): string {
+  return tehranParts(now).date;
+}
+
+/** Due once per Tehran day, on the first cycle at or after reportHour. */
+export function isDailyReportDue(
+  previous: DailyReport | undefined,
+  now: Date,
+  reportHour: number,
+): boolean {
+  const { date, hour } = tehranParts(now);
+  return previous?.date !== date && hour >= reportHour;
 }
 
 /** TGJU publishes coin prices in ریال; convert to تومان for display. */
@@ -285,6 +356,30 @@ export function formatCoinPriceToman(rial: number): string {
   return `${rialToToman(rial).toLocaleString("en-US")} تومان`;
 }
 
+export function formatQuotePrice(unit: PriceUnit, price: number): string {
+  if (unit === "usd") {
+    const usd = price.toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+    return `${usd} دلار`;
+  }
+  return formatCoinPriceToman(price);
+}
+
+function formatChangeLine(unit: PriceUnit, oldPrice: number, newPrice: number): string {
+  if (newPrice === oldPrice) {
+    return "بدون تغییر";
+  }
+  const direction = newPrice > oldPrice ? "🔺 افزایش" : "🔻 کاهش";
+  const percent = Math.abs(changePercent(oldPrice, newPrice)).toFixed(2);
+  return `${direction} ${formatQuotePrice(unit, Math.abs(newPrice - oldPrice))} (${percent}٪)`;
+}
+
+function formatTehranDate(at: Date): string {
+  return at.toLocaleDateString("fa-IR", { timeZone: TEHRAN_TZ, dateStyle: "long" });
+}
+
 function quoteTomanBySlug(quotes: CoinQuote[]): Record<CoinSlug, number> {
   const bySlug = {} as Record<CoinSlug, number>;
   for (const quote of quotes) {
@@ -294,8 +389,8 @@ function quoteTomanBySlug(quotes: CoinQuote[]): Record<CoinSlug, number> {
 }
 
 /**
- * ((سکه امامی × ۲) + نیم سکه + (۳ × سکه گرمی)) ÷ ۰٫۰۱
- * Prices are in تومان.
+ * ((سکه امامی × ۲) + نیم سکه + (۳ × سکه گرمی)) ÷ ۱٫۰۱
+ * Prices are in تومان; the result is rounded to whole تومان.
  */
 export function computeFinancialValueToman(quotes: CoinQuote[]): number {
   const bySlug = quoteTomanBySlug(quotes);
@@ -309,7 +404,7 @@ export function computeFinancialValueToman(quotes: CoinQuote[]): number {
   ) {
     throw new Error("financial value needs sekee, nim, and gerami quotes");
   }
-  return (emami * 2 + nim + 3 * gerami) / (0.01 + 1);
+  return Math.round((emami * 2 + nim + 3 * gerami) / (0.01 + 1));
 }
 
 export function formatFinancialValueSection(quotes: CoinQuote[]): string[] {
@@ -338,53 +433,59 @@ export function formatFinancialValueSection(quotes: CoinQuote[]): string[] {
   ];
 }
 
-export function formatCoinSnapshotMessage(quotes: CoinQuote[]): string {
+/** One block per quote; with a baseline, each block also shows the change since then. */
+function formatPriceReport(
+  header: string[],
+  quotes: CoinQuote[],
+  baseline?: CoinsStore,
+): string {
   const lines = [
-    "🪙 قیمت سکه (TGJU)",
-    "",
-    ...quotes.flatMap((q, index) => [
-      ...(index > 0 ? [""] : []),
-      q.name,
-      formatCoinPriceToman(q.price),
-    ]),
+    ...header,
+    ...quotes.flatMap((q) => {
+      const previous = baseline?.[q.slug];
+      return [
+        "",
+        q.name,
+        formatQuotePrice(q.unit, q.price),
+        ...(previous ? [formatChangeLine(q.unit, previous.lastPrice, q.price)] : []),
+      ];
+    }),
     ...formatFinancialValueSection(quotes),
     "",
     "منبع:",
-    COIN_PAGE_URL,
+    TGJU_URL,
   ];
   return lines.join("\n");
 }
 
-export function formatCoinPriceChangeMessage(
-  result: CoinCompareResult,
-  allQuotes?: CoinQuote[],
-): string {
-  const previous = result.previous;
-  if (!previous) {
-    throw new Error("price_changed coin result requires previous quote");
-  }
-  const oldPrice = previous.lastPrice;
-  const newPrice = result.quote.price;
-  const delta = Math.abs(newPrice - oldPrice);
-  const direction = newPrice < oldPrice ? "کاهش" : "افزایش";
+export function formatCoinSnapshotMessage(quotes: CoinQuote[]): string {
+  return formatPriceReport(["🪙 قیمت طلا و سکه (TGJU)"], quotes);
+}
 
-  return [
-    "🪙 تغییر قیمت سکه",
-    "",
-    "نوع:",
-    result.quote.name,
-    "",
-    "قیمت قبلی:",
-    formatCoinPriceToman(oldPrice),
-    "",
-    "قیمت جدید:",
-    formatCoinPriceToman(newPrice),
-    "",
-    "میزان تغییر:",
-    `${formatCoinPriceToman(delta)} ${direction}`,
-    ...(allQuotes ? formatFinancialValueSection(allQuotes) : []),
-    "",
-    "منبع:",
-    COIN_PAGE_URL,
-  ].join("\n");
+export function formatPriceAlertMessage(
+  quotes: CoinQuote[],
+  baseline: CoinsStore,
+  thresholdPercent: number,
+): string {
+  return formatPriceReport(
+    [
+      "🔔 تغییر قیمت طلا و سکه",
+      `تغییر ${thresholdPercent}٪ یا بیشتر نسبت به آخرین گزارش`,
+    ],
+    quotes,
+    baseline,
+  );
+}
+
+export function formatDailyReportMessage(
+  quotes: CoinQuote[],
+  previous: DailyReport | undefined,
+  now: Date,
+): string {
+  const header = [`📊 گزارش روزانهٔ طلا و سکه — ${formatTehranDate(now)}`];
+  if (previous) {
+    const previousAt = new Date(`${previous.date}T12:00:00Z`);
+    header.push(`مقایسه با گزارش ${formatTehranDate(previousAt)}`);
+  }
+  return formatPriceReport(header, quotes, previous?.prices);
 }

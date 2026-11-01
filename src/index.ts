@@ -4,47 +4,30 @@ import type { ScheduledTask } from "node-cron";
 import type { Telegraf } from "telegraf";
 
 import {
-  applyCoinCompareResults,
-  compareCoinQuotes,
+  findPriceAlerts,
+  formatCoinSnapshotMessage,
+  formatDailyReportMessage,
+  formatPriceAlertMessage,
   isCoinsStoreEmpty,
+  isDailyReportDue,
   loadCoins,
+  loadDailyReport,
+  rebaseline,
   saveCoins,
+  saveDailyReport,
   scrapeCoinQuotes,
-  type CoinQuote,
+  tehranDate,
 } from "./coins.js";
-import {
-  applyCompareResults,
-  comparePosts,
-  pruneStalePosts,
-} from "./compare.js";
-import { applyFilter, loadFilters } from "./filters.js";
 import { createLogger, type Logger } from "./logger.js";
-import { parsePostsFromHtml } from "./parser.js";
-import { delayBetweenFilters, fetchSearchHtml } from "./scraper.js";
 import { startScheduler, stopScheduler } from "./scheduler.js";
-import { isStoreEmpty, loadPosts, savePosts } from "./storage.js";
 import {
   createTelegramBot,
   createTelegramLogger,
-  formatTaskStartedMessage,
-  notifyCoinCompareResult,
-  notifyCoinSnapshot,
-  notifyCompareResult,
   normalizeTelegramApiRoot,
   sendTelegramMessage,
   verifyTelegram,
 } from "./telegram.js";
-import type { AppConfig, LogLevel, ScrapedPost } from "./types.js";
-
-function runSource(): string {
-  if (process.env.GITHUB_ACTIONS === "true") {
-    return "GitHub Actions";
-  }
-  if (process.env.RUN_ONCE === "1") {
-    return "once";
-  }
-  return "local";
-}
+import type { AppConfig, LogLevel } from "./types.js";
 
 function parseLogLevel(value: string | undefined): LogLevel {
   if (value === "info" || value === "warn" || value === "error") {
@@ -63,10 +46,16 @@ function loadConfig(): AppConfig {
     throw new Error("TELEGRAM_CHAT_ID is required");
   }
 
-  const pruneRaw = process.env.PRUNE_DAYS?.trim();
-  const pruneDays = pruneRaw ? Number(pruneRaw) : 14;
-  if (!Number.isFinite(pruneDays) || pruneDays < 0) {
-    throw new Error("PRUNE_DAYS must be a non-negative number");
+  const alertThresholdPercent = Number(
+    process.env.ALERT_THRESHOLD_PERCENT?.trim() || 0.5,
+  );
+  if (!Number.isFinite(alertThresholdPercent) || alertThresholdPercent < 0) {
+    throw new Error("ALERT_THRESHOLD_PERCENT must be a non-negative number");
+  }
+
+  const dailyReportHour = Number(process.env.DAILY_REPORT_HOUR?.trim() || 9);
+  if (!Number.isInteger(dailyReportHour) || dailyReportHour < 0 || dailyReportHour > 23) {
+    throw new Error("DAILY_REPORT_HOUR must be an integer between 0 and 23");
   }
 
   const telegramApiRoot = normalizeTelegramApiRoot(
@@ -79,49 +68,13 @@ function loadConfig(): AppConfig {
     telegramApiRoot,
     cronSchedule: process.env.CRON_SCHEDULE?.trim() || "*/5 * * * *",
     logLevel: parseLogLevel(process.env.LOG_LEVEL),
-    pruneDays,
+    alertThresholdPercent,
+    dailyReportHour,
   };
 }
 
-function dedupeById(posts: ScrapedPost[]): ScrapedPost[] {
-  const seen = new Map<string, ScrapedPost>();
-  for (const post of posts) {
-    if (!seen.has(post.id)) {
-      seen.set(post.id, post);
-    }
-  }
-  return [...seen.values()];
-}
-
-async function scrapeAllFilters(log: Logger): Promise<ScrapedPost[]> {
-  const filters = await loadFilters();
-  log.info(`loaded ${filters.length} filter(s)`);
-
-  const collected: ScrapedPost[] = [];
-
-  for (const [index, filter] of filters.entries()) {
-    try {
-      const html = await fetchSearchHtml(filter);
-      const parsed = parsePostsFromHtml(html, filter.id);
-      const matched = applyFilter(parsed, filter);
-      log.info(
-        `filter "${filter.id}": ${parsed.length} scraped, ${matched.length} matched`,
-      );
-      collected.push(...matched);
-    } catch (err) {
-      log.error(`filter "${filter.id}" failed`, err);
-    }
-
-    if (index < filters.length - 1) {
-      await delayBetweenFilters();
-    }
-  }
-
-  return dedupeById(collected);
-}
-
 export interface RunCycleOptions {
-  /** Always send a coin price snapshot (used on local startup). */
+  /** Always send a price snapshot (local startup, manual GitHub run). */
   forceCoinSnapshot?: boolean;
 }
 
@@ -134,136 +87,69 @@ export async function runCycle(
   log.info("cycle start");
 
   const tgLog = createTelegramLogger(config.logLevel);
-  try {
-    await sendTelegramMessage(
-      bot,
-      config.telegramChatId,
-      formatTaskStartedMessage(runSource()),
-      tgLog,
-    );
-  } catch (err) {
-    log.error("telegram task-started notify failed", err);
+  const now = new Date();
+  const nowIso = now.toISOString();
+
+  const quotes = await scrapeCoinQuotes(log);
+  if (quotes.length === 0) {
+    log.error("no prices scraped; skipping cycle");
+    return;
   }
 
-  const nowIso = new Date().toISOString();
+  /** Returns false when Telegram fails, so the report is retried next cycle. */
+  const send = async (kind: string, text: string): Promise<boolean> => {
+    try {
+      await sendTelegramMessage(bot, config.telegramChatId, text, tgLog);
+      log.info(`sent ${kind}`);
+      return true;
+    } catch (err) {
+      log.error(`telegram ${kind} failed`, err);
+      return false;
+    }
+  };
 
-  const [carsOutcome, coinsOutcome] = await Promise.all([
-    scrapeAllFilters(log)
-      .then((scraped) => ({ ok: true as const, scraped }))
-      .catch((err: unknown) => ({ ok: false as const, err })),
-    scrapeCoinQuotes(log)
-      .then((quotes) => ({ ok: true as const, quotes }))
-      .catch((err: unknown) => ({ ok: false as const, err })),
-  ]);
+  const store = await loadCoins();
+  const daily = await loadDailyReport();
 
-  if (!carsOutcome.ok) {
-    log.error("car scrape failed", carsOutcome.err);
-  }
-  if (!coinsOutcome.ok) {
-    log.error("coin scrape failed", coinsOutcome.err);
-  }
-
-  const scraped = carsOutcome.ok ? carsOutcome.scraped : [];
-  const coinQuotes: CoinQuote[] = coinsOutcome.ok ? coinsOutcome.quotes : [];
-
-  const store = await loadPosts();
-  const storedCount = Object.keys(store).length;
-  const coldStart = isStoreEmpty(store);
-  log.info(`store loaded: ${storedCount} post(s), coldStart=${coldStart}`);
-
-  const results = comparePosts(scraped, store);
-  let nextStore = applyCompareResults(store, results, nowIso);
-
-  const newCount = results.filter((r) => r.kind === "new").length;
-  const changedCount = results.filter((r) => r.kind === "price_changed").length;
-  const unchangedCount = results.filter((r) => r.kind === "unchanged").length;
-  const notifiable = results.filter(
-    (r) => r.kind === "new" || r.kind === "price_changed",
-  );
-  log.info(
-    `compare: new=${newCount} price_changed=${changedCount} unchanged=${unchangedCount} notifiable=${notifiable.length}`,
-  );
-
-  if (coldStart) {
-    log.warn(
-      `cold start: store was empty — baselining ${scraped.length} post(s); Telegram notifications SKIPPED on purpose (will notify only on later new/price_changed)`,
-    );
-  } else if (notifiable.length === 0) {
-    log.info("no notifiable car changes this cycle");
-  } else {
-    log.info(
-      `sending ${notifiable.length} Telegram notification(s) to chatId=${config.telegramChatId}`,
-    );
-    for (const result of notifiable) {
-      try {
-        await notifyCompareResult(bot, config.telegramChatId, result, tgLog);
-        log.info(`notified ${result.kind}: ${result.scraped.id}`);
-      } catch (err) {
-        log.error(`telegram notify failed for ${result.scraped.id}`, err);
-      }
+  // Every report lists all current prices, so at most one goes out per cycle.
+  let reported = false;
+  if (isDailyReportDue(daily, now, config.dailyReportHour)) {
+    reported = await send("daily report", formatDailyReportMessage(quotes, daily, now));
+    if (reported) {
+      await saveDailyReport({
+        date: tehranDate(now),
+        prices: rebaseline(daily?.prices ?? {}, quotes, nowIso),
+      });
     }
   }
 
-  if (coinQuotes.length > 0) {
-    const coinStore = await loadCoins();
-    const coinColdStart = isCoinsStoreEmpty(coinStore);
-    const coinResults = compareCoinQuotes(coinQuotes, coinStore);
-    const nextCoinStore = applyCoinCompareResults(
-      coinStore,
-      coinResults,
-      nowIso,
-    );
-    const coinChanged = coinResults.filter((r) => r.kind === "price_changed");
-    log.info(
-      `coins compare: coldStart=${coinColdStart} changed=${coinChanged.length}`,
-    );
+  if (!reported && (isCoinsStoreEmpty(store) || options.forceCoinSnapshot)) {
+    reported = await send("snapshot", formatCoinSnapshotMessage(quotes));
+  }
 
-    if (coinColdStart || options.forceCoinSnapshot) {
-      log.warn(
-        coinColdStart
-          ? "coin cold start: baselining quotes and sending initial snapshot"
-          : "startup: sending coin price snapshot",
+  if (!reported) {
+    const alerts = findPriceAlerts(quotes, store, config.alertThresholdPercent);
+    log.info(
+      `alerts (>= ${config.alertThresholdPercent}%): ${alerts.map((q) => q.slug).join(", ") || "none"}`,
+    );
+    if (alerts.length > 0) {
+      reported = await send(
+        "price alert",
+        formatPriceAlertMessage(quotes, store, config.alertThresholdPercent),
       );
-      try {
-        await notifyCoinSnapshot(bot, config.telegramChatId, coinQuotes, tgLog);
-      } catch (err) {
-        log.error("telegram coin snapshot failed", err);
-      }
-    } else if (coinChanged.length === 0) {
-      log.info("no coin price changes this cycle");
-    } else {
-      for (const result of coinChanged) {
-        try {
-          await notifyCoinCompareResult(
-            bot,
-            config.telegramChatId,
-            result,
-            tgLog,
-            coinQuotes,
-          );
-          log.info(`notified coin price_changed: ${result.quote.slug}`);
-        } catch (err) {
-          log.error(
-            `telegram coin notify failed for ${result.quote.slug}`,
-            err,
-          );
-        }
-      }
     }
-
-    await saveCoins(nextCoinStore);
   }
 
-  const pruned = pruneStalePosts(nextStore, config.pruneDays);
-  nextStore = pruned.store;
-  if (pruned.removedIds.length > 0) {
-    log.info(`pruned ${pruned.removedIds.length} stale post(s)`);
+  // Without a report the baseline stays put, so small moves add up to an alert;
+  // rows seen for the first time are baselined silently.
+  const toBaseline = reported
+    ? quotes
+    : quotes.filter((quote) => store[quote.slug] === undefined);
+  if (toBaseline.length > 0) {
+    await saveCoins(rebaseline(store, toBaseline, nowIso));
   }
 
-  await savePosts(nextStore);
-  log.info(
-    `cycle done: scraped=${scraped.length} new=${newCount} price_changed=${changedCount} unchanged=${unchangedCount} stored=${Object.keys(nextStore).length} coins=${coinQuotes.length}`,
-  );
+  log.info(`cycle done: quotes=${quotes.length} reported=${reported}`);
 }
 
 async function main(): Promise<void> {
@@ -275,7 +161,7 @@ async function main(): Promise<void> {
   });
 
   log.info(
-    `config: chatId=${config.telegramChatId} apiRoot=${config.telegramApiRoot} cron="${config.cronSchedule}" pruneDays=${config.pruneDays}`,
+    `config: chatId=${config.telegramChatId} apiRoot=${config.telegramApiRoot} cron="${config.cronSchedule}" alertThreshold=${config.alertThresholdPercent}% dailyReportHour=${config.dailyReportHour}`,
   );
 
   try {
@@ -331,9 +217,11 @@ async function main(): Promise<void> {
     void shutdown("SIGTERM");
   });
 
-  // yarn dev / long-running: send current coin prices once on startup.
-  // RUN_ONCE (e.g. GitHub Actions) only notifies on cold start / price change.
-  const forceCoinSnapshot = process.env.RUN_ONCE !== "1";
+  // Long-running / manual GitHub run: send current prices once on startup.
+  // Scheduled RUN_ONCE runs only send the daily report or price alerts.
+  const forceCoinSnapshot =
+    process.env.RUN_ONCE !== "1" ||
+    process.env.GITHUB_EVENT_NAME === "workflow_dispatch";
   await safeRunCycle({ forceCoinSnapshot });
   if (process.env.RUN_ONCE === "1") {
     log.info("RUN_ONCE set; exiting");
