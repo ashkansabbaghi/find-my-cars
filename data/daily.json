@@ -1,53 +1,53 @@
 {
-  "date": "2026-11-04",
+  "date": "2026-11-05",
   "prices": {
     "sekee": {
       "slug": "sekee",
       "name": "سکه امامی",
-      "price": 2610850000,
+      "price": 2646100000,
       "firstSeen": "2026-11-01T13:50:22.602Z",
-      "lastSeen": "2026-11-04T08:06:50.745Z",
-      "lastPrice": 2610850000
+      "lastSeen": "2026-11-05T09:23:24.233Z",
+      "lastPrice": 2646100000
     },
     "nim": {
       "slug": "nim",
       "name": "نیم سکه",
-      "price": 1386300000,
+      "price": 1396600000,
       "firstSeen": "2026-11-01T13:50:22.602Z",
-      "lastSeen": "2026-11-04T08:06:50.745Z",
-      "lastPrice": 1386300000
+      "lastSeen": "2026-11-05T09:23:24.233Z",
+      "lastPrice": 1396600000
     },
     "gerami": {
       "slug": "gerami",
       "name": "سکه گرمی",
-      "price": 374000000,
+      "price": 380000000,
       "firstSeen": "2026-11-01T13:50:22.602Z",
-      "lastSeen": "2026-11-04T08:06:50.745Z",
-      "lastPrice": 374000000
+      "lastSeen": "2026-11-05T09:23:24.233Z",
+      "lastPrice": 380000000
     },
     "geram18": {
       "slug": "geram18",
       "name": "طلای ۱۸ عیار (هر گرم)",
-      "price": 255095000,
+      "price": 261309000,
       "firstSeen": "2026-11-01T13:50:22.602Z",
-      "lastSeen": "2026-11-04T08:06:50.745Z",
-      "lastPrice": 255095000
+      "lastSeen": "2026-11-05T09:23:24.233Z",
+      "lastPrice": 261309000
     },
     "mesghal": {
       "slug": "mesghal",
       "name": "مثقال طلا",
-      "price": 1105050000,
+      "price": 1131870000,
       "firstSeen": "2026-11-01T13:50:22.602Z",
-      "lastSeen": "2026-11-04T08:06:50.745Z",
-      "lastPrice": 1105050000
+      "lastSeen": "2026-11-05T09:23:24.233Z",
+      "lastPrice": 1131870000
     },
     "ons": {
       "slug": "ons",
       "name": "انس طلا (جهانی)",
-      "price": 4016.6,
+      "price": 4126.79,
       "firstSeen": "2026-11-01T13:50:22.602Z",
-      "lastSeen": "2026-11-04T08:06:50.745Z",
-      "lastPrice": 4016.6
+      "lastSeen": "2026-11-05T09:23:24.233Z",
+      "lastPrice": 4126.79
     }
   }
 }
