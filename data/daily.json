@@ -1,53 +1,53 @@
 {
-  "date": "2026-11-18",
+  "date": "2026-11-19",
   "prices": {
     "sekee": {
       "slug": "sekee",
       "name": "سکه امامی",
-      "price": 2505750000,
+      "price": 2496800000,
       "firstSeen": "2026-11-01T13:50:22.602Z",
-      "lastSeen": "2026-11-18T08:54:00.094Z",
-      "lastPrice": 2505750000
+      "lastSeen": "2026-11-19T13:47:41.338Z",
+      "lastPrice": 2496800000
     },
     "nim": {
       "slug": "nim",
       "name": "نیم سکه",
-      "price": 1316100000,
+      "price": 1308900000,
       "firstSeen": "2026-11-01T13:50:22.602Z",
-      "lastSeen": "2026-11-18T08:54:00.094Z",
-      "lastPrice": 1316100000
+      "lastSeen": "2026-11-19T13:47:41.338Z",
+      "lastPrice": 1308900000
     },
     "gerami": {
       "slug": "gerami",
       "name": "سکه گرمی",
       "price": 360000000,
       "firstSeen": "2026-11-01T13:50:22.602Z",
-      "lastSeen": "2026-11-18T08:54:00.094Z",
+      "lastSeen": "2026-11-19T13:47:41.338Z",
       "lastPrice": 360000000
     },
     "geram18": {
       "slug": "geram18",
       "name": "طلای ۱۸ عیار (هر گرم)",
-      "price": 244877000,
+      "price": 243100000,
       "firstSeen": "2026-11-01T13:50:22.602Z",
-      "lastSeen": "2026-11-18T08:54:00.094Z",
-      "lastPrice": 244877000
+      "lastSeen": "2026-11-19T13:47:41.338Z",
+      "lastPrice": 243100000
     },
     "mesghal": {
       "slug": "mesghal",
       "name": "مثقال طلا",
-      "price": 1060750000,
+      "price": 1053060000,
       "firstSeen": "2026-11-01T13:50:22.602Z",
-      "lastSeen": "2026-11-18T08:54:00.094Z",
-      "lastPrice": 1060750000
+      "lastSeen": "2026-11-19T13:47:41.338Z",
+      "lastPrice": 1053060000
     },
     "ons": {
       "slug": "ons",
       "name": "انس طلا (جهانی)",
-      "price": 3763.68,
+      "price": 3724.55,
       "firstSeen": "2026-11-01T13:50:22.602Z",
-      "lastSeen": "2026-11-18T08:54:00.094Z",
-      "lastPrice": 3763.68
+      "lastSeen": "2026-11-19T13:47:41.338Z",
+      "lastPrice": 3724.55
     }
   }
 }
