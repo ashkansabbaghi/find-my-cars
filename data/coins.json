@@ -2,17 +2,17 @@
   "sekee": {
     "slug": "sekee",
     "name": "سکه امامی",
-    "price": 2432250000,
+    "price": 2431550000,
     "firstSeen": "2026-08-01T11:46:13.541Z",
-    "lastSeen": "2026-11-22T16:16:25.680Z",
-    "lastPrice": 2432250000
+    "lastSeen": "2026-11-23T02:16:41.689Z",
+    "lastPrice": 2431550000
   },
   "nim": {
     "slug": "nim",
     "name": "نیم سکه",
     "price": 1284100000,
     "firstSeen": "2026-08-01T11:46:13.541Z",
-    "lastSeen": "2026-11-22T16:16:25.680Z",
+    "lastSeen": "2026-11-23T02:16:41.689Z",
     "lastPrice": 1284100000
   },
   "gerami": {
@@ -20,31 +20,31 @@
     "name": "سکه گرمی",
     "price": 330100000,
     "firstSeen": "2026-08-01T11:46:13.541Z",
-    "lastSeen": "2026-11-22T16:16:25.680Z",
+    "lastSeen": "2026-11-23T02:16:41.689Z",
     "lastPrice": 330100000
   },
   "geram18": {
     "slug": "geram18",
     "name": "طلای ۱۸ عیار (هر گرم)",
-    "price": 234320000,
+    "price": 234584000,
     "firstSeen": "2026-11-01T13:50:22.602Z",
-    "lastSeen": "2026-11-22T16:16:25.680Z",
-    "lastPrice": 234320000
+    "lastSeen": "2026-11-23T02:16:41.689Z",
+    "lastPrice": 234584000
   },
   "mesghal": {
     "slug": "mesghal",
     "name": "مثقال طلا",
-    "price": 1014980000,
+    "price": 1017020000,
     "firstSeen": "2026-11-01T13:50:22.602Z",
-    "lastSeen": "2026-11-22T16:16:25.680Z",
-    "lastPrice": 1014980000
+    "lastSeen": "2026-11-23T02:16:41.689Z",
+    "lastPrice": 1017020000
   },
   "ons": {
     "slug": "ons",
     "name": "انس طلا (جهانی)",
-    "price": 3535,
+    "price": 3606.8,
     "firstSeen": "2026-11-01T13:50:22.602Z",
-    "lastSeen": "2026-11-22T16:16:25.680Z",
-    "lastPrice": 3535
+    "lastSeen": "2026-11-23T02:16:41.689Z",
+    "lastPrice": 3606.8
   }
 }
